@@ -21,7 +21,7 @@ namespace TweetHelper
 		{
 			Console.WriteLine("Processing Tweets...");
 			for (var i = 0; i < InFilePaths.Length; i++)
-				new TweetProcessor(InFilePaths[i], OutFilepath + "_" + i).ProcessFilesToArff(HashtagsPerFile[i]);
+				new TweetProcessor(InFilePaths[i], OutFilepath).ProcessFilesToArff(HashtagsPerFile[i]);
 		}
 	}
 }

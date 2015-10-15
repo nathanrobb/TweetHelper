@@ -33,9 +33,9 @@ namespace TweetHelper
 			foreach (var file in _filesIn)
 				ParseFile(File.ReadLines(file), tweets);
 
-			var orderedTweets = tweets.Values.SelectMany(r => r).ToList();
+			var orderedTweets = tweets.Values.SelectMany(r => r).ToArray();
 
-			var fourfiths = (orderedTweets.Count * 4) / 5;
+			var fourfiths = (orderedTweets.Length * 4) / 5;
 
 			// We want the class values W.R.T. each of the other hashtags and foreground / background data (so eight files).
 			foreach (var hashtag in hashtags)
