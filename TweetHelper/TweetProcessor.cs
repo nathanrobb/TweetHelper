@@ -15,8 +15,6 @@ namespace TweetHelper
 		private const string AsciiPattern = @"[^\u0000-\u007F]";
 		private static readonly Regex AsciiRegex = new Regex(AsciiPattern);
 
-		private const int DateFieldLength = 30;
-
 		private readonly string[] _filesIn;
 		private readonly string _fileOut;
 
@@ -26,8 +24,10 @@ namespace TweetHelper
 			_fileOut = fileOut;
 		}
 
-		public void ProcessFilesToArff(IEnumerable<string> hashtags)
+		public void ProcessFilesToArff(string[] hashtags)
 		{
+			Tweet.TestHashtags = new HashSet<string>(hashtags);
+
 			var tweets = new SortedDictionary<DateTime, List<Tweet>>();
 
 			foreach (var file in _filesIn)
@@ -89,7 +89,7 @@ namespace TweetHelper
 
 				// Format in: date, tweet.
 				var splitIndex = parsedLine.IndexOf(',');                   // Find where the first date splits (tweet may have a comma in it).
-				if (splitIndex != DateFieldLength)
+				if (splitIndex != Tweet.DateFieldLength)                    // Else it's a multiline tweet.
 					splitIndex = 0;
 
 				if (splitIndex > 0)
@@ -97,7 +97,7 @@ namespace TweetHelper
 					var currDate = parsedLine.Substring(0, splitIndex++);
 
 					if (!DateRegex.IsMatch(currDate))
-					{
+					{   // Else it's a multiline tweet.
 						prevTweet += " " + parsedLine;
 						continue;
 					}
@@ -122,7 +122,7 @@ namespace TweetHelper
 
 		private static void AddTweet(IDictionary<DateTime, List<Tweet>> tweets, string prevDate, string prevTweet)
 		{
-			var d = DateTime.ParseExact(prevDate, "ddd MMM dd H:mm:ss zzz yyyy", System.Globalization.CultureInfo.InvariantCulture);
+			var d = DateTime.ParseExact(prevDate, Tweet.DateFormat, System.Globalization.CultureInfo.InvariantCulture);
 			List<Tweet> list;
 			if (!tweets.TryGetValue(d, out list))
 			{

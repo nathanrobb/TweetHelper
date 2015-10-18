@@ -6,14 +6,19 @@ namespace TweetHelper
 {
 	class Tweet
 	{
-		private static readonly HashSet<string> TestHashtags = new HashSet<string>(Program.HashtagsPerFile.SelectMany(h => h));
+		// Change fro what are valid hashtags.
+		public static ISet<string> TestHashtags;
+		// Change this to change the class
+		public static string ThisHashtag;
+
+		// Change this for the Date format of tweets to import (Used in Date.ParseExact).
+		public const string DateFormat = "ddd MMM dd H:mm:ss zzz yyyy";
+		public static readonly int DateFieldLength = DateFormat.Length + 2;
+
 		private static readonly char[] Split = { ' ' };
 		private static readonly char[] PMap = "& !\",.?".ToCharArray();
 
 		private const string Rt = "rt";
-
-		// Change this to change the class
-		public static string ThisHashtag;
 
 		private DateTime Time { get; }
 		private string[] Words { get; set; }
@@ -39,6 +44,11 @@ namespace TweetHelper
 				if (word.StartsWith("#"))
 				{
 					var hash = word.TrimEnd(PMap);
+
+					// If not set, the first hashtag found will be used.
+					if (TestHashtags == null)
+						TestHashtags = new HashSet<string> { hash };
+
 					if (TestHashtags.Contains(hash))
 						Hashtag = hash;
 					continue;
@@ -55,7 +65,7 @@ namespace TweetHelper
 
 		public bool IsValidTweet()
 		{
-			return Words != null && Words.Length != 0 && Words.FirstOrDefault() != Rt;
+			return Words?.Length != 0 && Words?.FirstOrDefault() != Rt;
 		}
 
 		public override string ToString()
