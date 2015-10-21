@@ -6,7 +6,7 @@
 		private static readonly string[][] HashtagsPerFile =
 		{
 			new[] { "#apple", "#mlb" },
-			new[] { "#fashon", "#food" }
+			new[] { "#fashion", "#food" }
 		};
 
 		// Input files - grouped by similar time period.
