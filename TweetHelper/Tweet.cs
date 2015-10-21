@@ -6,8 +6,6 @@ namespace TweetHelper
 {
 	class Tweet
 	{
-		// Change fro what are valid hashtags.
-		public static ISet<string> TestHashtags;
 		// Change this to change the class
 		public static string ThisHashtag;
 
@@ -21,7 +19,7 @@ namespace TweetHelper
 		private const string Rt = "rt";
 
 		private DateTime Time { get; }
-		private string[] Words { get; set; }
+		private List<string> Words { get; set; }
 		private string Hashtag { get; set; }
 		private int ClassValue => Convert.ToInt32(Hashtag == ThisHashtag);
 
@@ -45,12 +43,18 @@ namespace TweetHelper
 				{
 					var hash = word.TrimEnd(PMap);
 
-					// If not set, the first hashtag found will be used.
-					if (TestHashtags == null)
-						TestHashtags = new HashSet<string> { hash };
+					// If no hashtags in tweet.
+					//if (ThisHashtag == hash)
+					//	Hashtag = hash;
+					//continue;
 
-					if (TestHashtags.Contains(hash))
+					// If only the topic of interest hashtag is removed.
+					if (ThisHashtag == hash)
+					{
 						Hashtag = hash;
+						continue;
+					}
+					allWords.Add(word.TrimEnd(PMap));
 					continue;
 				}
 
@@ -60,12 +64,12 @@ namespace TweetHelper
 			allWords.RemoveAll(string.IsNullOrWhiteSpace);
 
 
-			Words = allWords.ToArray();
+			Words = allWords;
 		}
 
 		public bool IsValidTweet()
 		{
-			return Words?.Length != 0 && Words?.FirstOrDefault() != Rt;
+			return Words.Count != 0 && Words.FirstOrDefault() != Rt;
 		}
 
 		public override string ToString()

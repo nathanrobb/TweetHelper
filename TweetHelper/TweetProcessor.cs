@@ -24,10 +24,8 @@ namespace TweetHelper
 			_fileOut = fileOut;
 		}
 
-		public void ProcessFilesToArff(string[] hashtags)
+		public void ProcessFilesToArff(IEnumerable<string> hashtags)
 		{
-			Tweet.TestHashtags = new HashSet<string>(hashtags);
-
 			var tweets = new SortedDictionary<DateTime, List<Tweet>>();
 
 			foreach (var file in _filesIn)
