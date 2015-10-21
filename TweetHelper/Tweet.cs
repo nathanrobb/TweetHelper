@@ -6,15 +6,22 @@ namespace TweetHelper
 {
 	class Tweet
 	{
+		// Change fro what are valid hashtags.
+		public static ISet<string> TestHashtags;
+
 		// Change this to change the class
 		public static string ThisHashtag;
 
+		public const string Pattern = @"[^a-z0-9,+#\s:]+";
+
 		// Change this for the Date format of tweets to import (Used in Date.ParseExact).
+		public const string DatePattern = @"^[a-z][a-z][a-z]\s[a-z][a-z][a-z]\s[0-9][0-9]\s[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\s\+0000\s201[0-9]$";
 		public const string DateFormat = "ddd MMM dd H:mm:ss zzz yyyy";
-		public static readonly int DateFieldLength = DateFormat.Length + 2;
+		public static readonly int DateFieldLength = DateFormat.Length + 3;
 
 		private static readonly char[] Split = { ' ' };
-		private static readonly char[] PMap = "& !\",.?".ToCharArray();
+
+		private static readonly char[] Punc = { '+', ',', '#', ':' };
 
 		private const string Rt = "rt";
 
@@ -34,14 +41,14 @@ namespace TweetHelper
 			if (string.IsNullOrWhiteSpace(tweet))
 				throw new Exception("No Tweet!");
 
-			var words2 = tweet.Split(Split, StringSplitOptions.RemoveEmptyEntries);
+			var tweetWords = tweet.Split(Split, StringSplitOptions.RemoveEmptyEntries);
 			var allWords = new List<string>();
 
-			foreach (var word in words2)
+			foreach (var word in tweetWords)
 			{
 				if (word.StartsWith("#"))
 				{
-					var hash = word.TrimEnd(PMap);
+					var hash = "#" + word.Trim(Punc);
 
 					// If no hashtags in tweet.
 					//if (ThisHashtag == hash)
@@ -49,21 +56,19 @@ namespace TweetHelper
 					//continue;
 
 					// If only the topic of interest hashtag is removed.
-					if (ThisHashtag == hash)
+					if (TestHashtags.Contains(hash))
 					{
 						Hashtag = hash;
 						continue;
 					}
-					allWords.Add(word.TrimEnd(PMap));
+					allWords.Add(hash);
 					continue;
 				}
 
-				allWords.Add(word.Trim(PMap));
+				allWords.Add(word.Trim(Punc));
 			}
 
 			allWords.RemoveAll(string.IsNullOrWhiteSpace);
-
-
 			Words = allWords;
 		}
 

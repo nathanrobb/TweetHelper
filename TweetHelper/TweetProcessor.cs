@@ -9,11 +9,8 @@ namespace TweetHelper
 {
 	class TweetProcessor
 	{
-		private const string DatePattern = @"^[a-z][a-z][a-z]\s[a-z][a-z][a-z]\s[0-9][0-9]\s[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\s\+0000\s201[0-9]$";
-		private static readonly Regex DateRegex = new Regex(DatePattern);
-
-		private const string AsciiPattern = @"[^\u0000-\u007F]";
-		private static readonly Regex AsciiRegex = new Regex(AsciiPattern);
+		private static readonly Regex DateRegex = new Regex(Tweet.DatePattern);
+		private static readonly Regex TweetRegex = new Regex(Tweet.Pattern);
 
 		private readonly string[] _filesIn;
 		private readonly string _fileOut;
@@ -24,8 +21,9 @@ namespace TweetHelper
 			_fileOut = fileOut;
 		}
 
-		public void ProcessFilesToArff(IEnumerable<string> hashtags)
+		public void ProcessFilesToArff(string[] hashtags)
 		{
+			Tweet.TestHashtags = new HashSet<string>(hashtags);
 			var tweets = new SortedDictionary<DateTime, List<Tweet>>();
 
 			foreach (var file in _filesIn)
@@ -76,14 +74,13 @@ namespace TweetHelper
 			var prevDate = string.Empty;
 			var prevTweet = string.Empty;
 
-			foreach (var line in reader.Where(l => !string.IsNullOrWhiteSpace(l)))
+			foreach (var line in reader.Where(l => !string.IsNullOrWhiteSpace(l)).Select(w => w.ToLower()))
 			{
 				var parsedLine = HttpUtility.HtmlDecode(line);              // Decode Web encodings (&quot;, etc.).
-				parsedLine = AsciiRegex.Replace(parsedLine, string.Empty)   // Parse as Ascii.
+				parsedLine = TweetRegex.Replace(parsedLine, string.Empty)   // Strip bad chars and punctuation.
 					.Replace("\"", string.Empty)                            // Remove Quote marks.
 					.Replace("\\", "\\\\")                                  // Escape \.
-					.Replace(Environment.NewLine, "")                       // Remove NewLine.
-					.ToLower();                                             // Ensure lower case tweet.
+					.Replace(Environment.NewLine, "");                      // Remove NewLine.
 
 				// Format in: date, tweet.
 				var splitIndex = parsedLine.IndexOf(',');                   // Find where the first date splits (tweet may have a comma in it).
