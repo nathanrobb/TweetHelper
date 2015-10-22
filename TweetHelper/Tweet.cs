@@ -12,6 +12,7 @@ namespace TweetHelper
 		// Change this to change the class
 		public static string ThisHashtag;
 
+		// Allowed chahracters in tweet (including date), the non-a-z and \s characters are removed later.
 		public const string Pattern = @"[^a-z0-9,+#\s:]+";
 
 		// Change this for the Date format of tweets to import (Used in Date.ParseExact).
@@ -49,6 +50,9 @@ namespace TweetHelper
 				if (word.StartsWith("#"))
 				{
 					var hash = "#" + word.Trim(Punc);
+
+					if (hash.Length == 1)
+						continue;
 
 					// If no hashtags in tweet.
 					//if (ThisHashtag == hash)
